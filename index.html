@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow Box</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --background: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --surface: #FFFFFF;
+            --border: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* Login Overlay */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: var(--background);
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .login-box p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Main App Content (hidden initially) */
+        #appContent {
+            display: none;
+        }
+
+        /* Navbar */
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-container input {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            outline: none;
+            width: 200px;
+        }
+
+        .search-container button {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            width: auto;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 5rem 5%;
+            text-align: center;
+            background: linear-gradient(to bottom, #EEF2FF, var(--background));
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Features */
+        .features {
+            padding: 5rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+        }
+
+        /* Form Section */
+        .form-section {
+            padding: 5rem 5%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-container {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #message {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+            min-height: 24px;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: #1F2937;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast-icon {
+            color: var(--primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-main);
+            color: var(--surface);
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-right {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>Borrow Box</h2>
+            <p>Please enter your name to continue.</p>
+            <form id="loginForm">
+                <input type="text" id="usernameInput" placeholder="Your Name" required>
+                <button type="submit">Enter Website</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <div id="appContent">
+        <nav>
+            <a href="#" class="logo">Borrow Box</a>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <span id="activeUsersDisplay"
+                        style="color: var(--primary); font-weight: bold; display: none; align-items: center;">🟢 1
+                        Online</span>
+                    <a href="#features">Features</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <form id="searchForm" class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search items..." required>
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>Welcome to Borrow Box, <span id="displayUsername"></span></h1>
+            <p>Your one-stop solution for managing items efficiently and effortlessly. Discover a new way to borrow and
+                lend.</p>
+            <button style="max-width: 200px;"
+                onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">Get Started</button>
+        </section>
+
+        <section id="features" class="features">
+            <div class="feature-card">
+                <h3>Easy Tracking</h3>
+                <p>Keep track of everything you borrow and lend in one secure place.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Reliable System</h3>
+                <p>Built with stability and efficiency in mind, ensuring your data is always safe.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Seamless Interface</h3>
+                <p>Enjoy a beautifully crafted interface designed to make your experience intuitive.</p>
+            </div>
+        </section>
+
+        <section id="contact" class="form-section">
+            <div class="form-container">
+                <h2>Join Borrow Box</h2>
+                <form id="borrowForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" placeholder="+1 (555) 000-0000" required>
+                    </div>
+                    <button type="submit" id="submitBtn">Submit Details</button>
+                    <div id="message"></div>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Borrow Box. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Socket.io library (Using CDN so it works from Netlify) -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Check if user is opening via file://
+        if (window.location.protocol === 'file:') {
+            alert("⚠️ WARNING: Real-time features will not work when opening the file directly (file://). Please go to http://localhost:3000 in your browser!");
+            document.body.innerHTML = "<h1 style='text-align:center; padding: 50px; color:red;'>Please open http://localhost:3000 in your browser to test real-time features.</h1>";
+        }
+
+        let socket = null;
+        let currentUsername = "";
+
+        // --- Login Logic ---
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const input = document.getElementById('usernameInput').value.trim();
+            if (input) {
+                currentUsername = input;
+                // Hide login, show app
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('displayUsername').textContent = currentUsername;
+
+                // Initialize Socket connection
+                initSocket();
+            }
+        });
+
+        // --- Socket & Search Notifications Logic ---
+        function initSocket() {
+            // IMPORTANT: When you host your server.js online (e.g. Render/Glitch), put the URL here!
+            // Example: const BACKEND_URL = "https://borrowbox-backend.onrender.com";
+            const BACKEND_URL = undefined; // Leave as undefined for local testing
+
+            socket = io(BACKEND_URL);
+
+            socket.on('active_users', (count) => {
+                const el = document.getElementById('activeUsersDisplay');
+                el.style.display = 'flex';
+                el.innerHTML = `🟢 ${count} Online`;
+            });
+
+            // Listen for search events from other users
+            socket.on('search_notification', (data) => {
+                showToast(`🔔 <b>${data.username}</b> searched for: <i>"${data.query}"</i>`);
+            });
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const query = document.getElementById('searchInput').value.trim();
+            if (query && socket) {
+                // Emit search event to server
+                socket.emit('search', { username: currentUsername, query: query });
+                // Clear input
+                document.getElementById('searchInput').value = '';
+                showToast(`You searched for: "${query}"`);
+            }
+        });
+
+        function showToast(htmlContent) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = htmlContent;
+            container.appendChild(toast);
+
+            // Remove toast after 4 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- Original Form Logic ---
+        function showSuccess() {
+            const messageEl = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            messageEl.textContent = "Thank you! Your response has been submitted successfully.";
+            messageEl.style.color = '#16A34A'; // green
+            document.getElementById('borrowForm').reset();
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+        }
+
+        function showError() {
+            const messageEl = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+            messageEl.textContent = 'An error occurred. Please try again.';
+            messageEl.style.color = '#DC2626'; // red
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+        }
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpVsiCZiSeiua1mFe182-OrjiWOh1fpGp2-PznwHTunLCiAyVbFGyyv1t-d7M3-lKK/exec";
+
+        document.getElementById('borrowForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const messageEl = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Validation
+            if (!name) {
+                messageEl.textContent = 'Name must not be empty.';
+                messageEl.style.color = '#DC2626'; // red
+                return;
+            }
+            if (!phone) {
+                messageEl.textContent = 'Phone must not be empty.';
+                messageEl.style.color = '#DC2626'; // red
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                messageEl.textContent = 'Please enter a valid email address.';
+                messageEl.style.color = '#DC2626'; // red
+                return;
+            }
+
+            // Processing state
+            messageEl.textContent = 'Submitting...';
+            messageEl.style.color = '#4F46E5'; // primary blue
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+
+            // Exact fetch approach requested
+            const url = SCRIPT_URL + "?" + new URLSearchParams({
+                name: name,
+                email: email,
+                phone: phone
+            });
+
+            fetch(url, {
+                method: "GET",
+                mode: "no-cors"
+            })
+                .then(() => showSuccess())
+                .catch(() => showError());
+        });
+    </script>
+</body>
+
+</html>
